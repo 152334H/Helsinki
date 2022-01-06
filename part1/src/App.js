@@ -12,6 +12,23 @@ const Button = ({ onClick, text }) => (
     <button onClick={onClick}>{text}</button>
 )
 const Stat = ({name, value}) => <div>{name} {value}</div>
+const Statistics = ({good, neutral, bad}) => {
+    const total = good + neutral + bad
+    const average = (good - bad) / total
+    const positive = good / total * 100
+    if (total === 0) { return <div>No feedback given</div> }
+    return (
+        <div>
+            <h1>statistics</h1>
+            <Stat name="good" value={good} />
+            <Stat name="neutral" value={neutral} />
+            <Stat name="bad" value={bad} />
+            <Stat name="all" value={total} />
+            <Stat name="average" value={average} />
+            <Stat name="positive" value={''+positive+'%'} />
+        </div>
+    )
+}
 const App = () => {
     // save clicks of each button to its own state
     const [good, setGood] = useState(0)
@@ -24,13 +41,7 @@ const App = () => {
         <Button onClick={() => setGood(good+1)} text='good'/>
         <Button onClick={() => setNeutral(neutral+1)} text='neutral'/>
         <Button onClick={() => setBad(bad+1)} text='bad'/>
-        <h1>statistics</h1>
-        <Stat name='good' value={good}/>
-        <Stat name='neutral' value={neutral}/>
-        <Stat name='bad' value={bad}/>
-        <Stat name='all' value={total}/>
-        <Stat name='average' value={(good-bad)/total}/>
-        <Stat name='positive' value={''+(100*good/total)+'%'}/>
+        <Statistics good={good} neutral={neutral} bad={bad} />
     </div>) // NaN is intentional
 }
 
