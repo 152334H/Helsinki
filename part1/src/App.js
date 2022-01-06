@@ -8,33 +8,26 @@ const History = (props) => {
     }
     return <div>button press history: {props.allClicks.join(' ')}</div>
 }
-const Button = ({ handleClick, text }) => (
-  <button onClick={handleClick}>{text}</button>
+const Button = ({ onClick, text }) => (
+    <button onClick={onClick}>{text}</button>
 )
+const Stat = ({name, value}) => <div>{name} {value}</div>
 const App = () => {
-    const [left, setLeft] = useState(0)
-    const [right, setRight] = useState(0)
-    const [allClicks, setAll] = useState([])
+    // save clicks of each button to its own state
+    const [good, setGood] = useState(0)
+    const [neutral, setNeutral] = useState(0)
+    const [bad, setBad] = useState(0)
 
-    const handleLeftClick = () => {
-        setAll(allClicks.concat('L'))
-        setLeft(left + 1)
-    }
-
-    const handleRightClick = () => {
-        setAll(allClicks.concat('R'))
-        setRight(right + 1)
-    }
-
-    return (
-        <div>
-        {left}
-        <Button handleClick={handleLeftClick} text="left"/>
-        <Button handleClick={handleRightClick} text="right"/>
-        {right}
-        <History allClicks={allClicks}/>
-        </div>
-    )
+    return (<div>
+        <h1>give feedback</h1>
+        <Button onClick={() => setGood(good+1)} text='good'/>
+        <Button onClick={() => setNeutral(neutral+1)} text='neutral'/>
+        <Button onClick={() => setBad(bad+1)} text='bad'/>
+        <h1>statistics</h1>
+        <Stat name='good' value={good}/>
+        <Stat name='neutral' value={neutral}/>
+        <Stat name='bad' value={bad}/>
+    </div>)
 }
 
 export default App;
