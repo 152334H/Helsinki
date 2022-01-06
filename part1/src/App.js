@@ -17,6 +17,7 @@ const App = () => {
     const [good, setGood] = useState(0)
     const [neutral, setNeutral] = useState(0)
     const [bad, setBad] = useState(0)
+    const total = good + neutral + bad
 
     return (<div>
         <h1>give feedback</h1>
@@ -27,7 +28,10 @@ const App = () => {
         <Stat name='good' value={good}/>
         <Stat name='neutral' value={neutral}/>
         <Stat name='bad' value={bad}/>
-    </div>)
+        <Stat name='all' value={total}/>
+        <Stat name='average' value={(good-bad)/total}/>
+        <Stat name='positive' value={''+(100*good/total)+'%'}/>
+    </div>) // NaN is intentional
 }
 
 export default App;
