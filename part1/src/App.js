@@ -11,21 +11,24 @@ const History = (props) => {
 const Button = ({ onClick, text }) => (
     <button onClick={onClick}>{text}</button>
 )
-const StatisticLine = ({name, value}) => <div>{name} {value}</div>
+const StatisticLine = ({name, value}) => (<tr>
+    <td>{name}</td> <td>{value}</td>
+</tr>)
 const Statistics = ({good, neutral, bad}) => {
     const total = good + neutral + bad
     const average = (good - bad) / total
     const positive = good / total * 100
     if (total === 0) { return <div>No feedback given</div> }
     return (
-        <div>
-            <h1>statistics</h1>
+        <div><h1>statistics</h1>
+        <table>
             <StatisticLine name="good" value={good} />
             <StatisticLine name="neutral" value={neutral} />
             <StatisticLine name="bad" value={bad} />
             <StatisticLine name="all" value={total} />
             <StatisticLine name="average" value={average} />
             <StatisticLine name="positive" value={''+positive+'%'} />
+        </table>
         </div>
     )
 }
