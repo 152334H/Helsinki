@@ -11,7 +11,7 @@ const History = (props) => {
 const Button = ({ onClick, text }) => (
     <button onClick={onClick}>{text}</button>
 )
-const Stat = ({name, value}) => <div>{name} {value}</div>
+const StatisticLine = ({name, value}) => <div>{name} {value}</div>
 const Statistics = ({good, neutral, bad}) => {
     const total = good + neutral + bad
     const average = (good - bad) / total
@@ -20,12 +20,12 @@ const Statistics = ({good, neutral, bad}) => {
     return (
         <div>
             <h1>statistics</h1>
-            <Stat name="good" value={good} />
-            <Stat name="neutral" value={neutral} />
-            <Stat name="bad" value={bad} />
-            <Stat name="all" value={total} />
-            <Stat name="average" value={average} />
-            <Stat name="positive" value={''+positive+'%'} />
+            <StatisticLine name="good" value={good} />
+            <StatisticLine name="neutral" value={neutral} />
+            <StatisticLine name="bad" value={bad} />
+            <StatisticLine name="all" value={total} />
+            <StatisticLine name="average" value={average} />
+            <StatisticLine name="positive" value={''+positive+'%'} />
         </div>
     )
 }
