@@ -2,6 +2,13 @@ import React, { useState } from 'react'
 
 //const PhoneEntry = ({name}) => <li>{name}</li>
 
+const Numbers = ({persons}) => (<>
+    <h2>Numbers</h2>
+    <ul>
+        {persons.map(p => <li key={p.name}>{p.name} {p.number}</li>)}
+    </ul>
+</>)
+
 const App = () => {
     const [persons, setPersons] = useState([
         { name: 'Arto Hellas' }
@@ -28,10 +35,7 @@ const App = () => {
                 <button type="submit">add</button>
             </div>
         </form>
-        <h2>Numbers</h2>
-        <ul>
-            {persons.map(person => <li key={person.name}>{person.name}</li>)}
-        </ul>
+        <Numbers persons={persons} />
     </div>)
 }
 
