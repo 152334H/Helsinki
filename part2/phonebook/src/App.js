@@ -1,8 +1,16 @@
 import React, { useState } from 'react'
 
-//const PhoneEntry = ({name}) => <li>{name}</li>
+const Filter = ({filter, onChange}) => (<>
+    <p>filter shown with <input value={filter} onChange={onChange}/></p>
+</>)
 
-const Numbers = ({persons}) => (<>
+const PersonForm = ({onSubmit, newName, newNumber, onNameChange, onNumberChange}) => (<form onSubmit={onSubmit}>
+    <div> name: <input value={newName} onChange={onNameChange}/> </div>
+    <div> number: <input value={newNumber} onChange={onNumberChange}/> </div>
+    <div> <button type="submit">add</button> </div>
+</form>)
+
+const Persons = ({persons}) => (<>
     <h2>Numbers</h2>
     <ul>
         {persons.map(p => <li key={p.name}>{p.name} {p.number}</li>)}
@@ -40,16 +48,10 @@ const App = () => {
 
     return (<div>
         <h2>Phonebook</h2>
-        <p>filter shown with <input value={nameFilter} onChange={e => setNameFilter(e.target.value)}/></p>
-        <h2>add a new</h2>
-        <form onSubmit={addName}>
-            <div>name: <input value={newName} onChange={e => setNewName(e.target.value)}/></div>
-            <div>number: <input value={newNumber} onChange={e => setNewNumber(e.target.value)}/></div>
-            <div>
-                <button type="submit">add</button>
-            </div>
-        </form>
-        <Numbers persons={shownPersons} />
+        <Filter filter={nameFilter} onChange={e => setNameFilter(e.target.value)}/>
+        <h3>Add a new</h3>
+        <PersonForm onSubmit={addName} newName={newName} newNumber={newNumber} onNameChange={e => setNewName(e.target.value)} onNumberChange={e => setNewNumber(e.target.value)}/> {/* Why do you even want to do this? What's the point? */}
+        <Persons persons={shownPersons} />
     </div>)
 }
 
