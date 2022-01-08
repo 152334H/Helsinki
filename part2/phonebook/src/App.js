@@ -11,9 +11,10 @@ const Numbers = ({persons}) => (<>
 
 const App = () => {
     const [persons, setPersons] = useState([
-        { name: 'Arto Hellas' }
+        { name: 'Arto Hellas', number: '040-1234567' }
     ]) 
     const [newName, setNewName] = useState('')
+    const [newNumber, setNewNumber] = useState('')
 
     const addName = e => {
         e.preventDefault()
@@ -23,6 +24,7 @@ const App = () => {
         }
         const newPerson = {
             name: newName,
+            number: newNumber,
             //id: persons.length + 1
         }
         setPersons(persons.concat(newPerson))
@@ -32,9 +34,8 @@ const App = () => {
     return (<div>
         <h2>Phonebook</h2>
         <form onSubmit={addName}>
-            <div>
-                name: <input value={newName} onChange={e => setNewName(e.target.value)}/>
-            </div>
+            <div>name: <input value={newName} onChange={e => setNewName(e.target.value)}/></div>
+            <div>number: <input value={newNumber} onChange={e => setNewNumber(e.target.value)}/></div>
             <div>
                 <button type="submit">add</button>
             </div>
