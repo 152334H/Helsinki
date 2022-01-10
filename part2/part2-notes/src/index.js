@@ -1,6 +1,21 @@
 import ReactDOM from 'react-dom'
 import App from './App.js'
 
+import axios from 'axios'
+
+/*
+axios.get('http://de.irscybersec.tk:3001/notes').then(response => {
+  const notes = response.data
+    console.log(notes)
+  ReactDOM.render(
+    <App notes={notes} />,
+    document.getElementById('root')
+  )
+})
+*/
+
+ReactDOM.render(<App/>, document.getElementById('root'))
+/*
 const notes = [
   {
     id: 1,
@@ -26,3 +41,4 @@ ReactDOM.render(
   <App notes={notes} />,
   document.getElementById('root')
 )
+*/
