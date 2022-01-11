@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import personDB from './services/personDB'
 
+const genericError = () => alert('Something went wrong with the server')
+
 const Filter = ({filter, onChange}) => (<>
     <p>filter shown with <input value={filter} onChange={onChange}/></p>
 </>)
@@ -25,6 +27,10 @@ const App = () => {
     const [newName, setNewName] = useState('')
     const [newNumber, setNewNumber] = useState('')
     const [nameFilter, setNameFilter] = useState('')
+    const clearForm = () => {
+        setNewName('')
+        setNewNumber('')
+    }
 
     useEffect(() => personDB.getPersons().then(setPersons), [])
 
@@ -33,23 +39,31 @@ const App = () => {
     const rmPerson = id => personDB.deletePerson(id)
         .then(returnedPerson => persons.filter(p => p.id !== id))
         .then(setPersons)
+        .catch(genericError)
 
     const addName = e => {
         e.preventDefault()
-        if (persons.find(p => p.name === newName)) {
-            alert(`${newName} is already added to phonebook`)
-            return
-        }
         const newPerson = {
             name: newName,
             number: newNumber,
             //id: persons.length + 1
         }
-        personDB.addPerson(newPerson).then(returnedPerson => {
-            setPersons(persons.concat(returnedPerson))
-            setNewName('')
-            setNewNumber('')
-        })
+        if (persons.find(p => p.name === newName)) {
+            //alert(`${newName} is already added to phonebook`)
+            if (window.confirm(`${newName} is already added to phonebook, replace the old number with a new one?`)) {
+                const origPerson = persons.find(p => p.name === newName)
+                personDB.editPerson(origPerson.id, newPerson)
+                    .then(returnedPerson => setPersons(persons.map(
+                        p => p.id===origPerson.id ? returnedPerson : p
+                    ))).then(clearForm)
+                    .catch(genericError)
+            }
+        } else {
+            personDB.addPerson(newPerson).then(returnedPerson => {
+                setPersons(persons.concat(returnedPerson))
+                clearForm()
+            }).catch(genericError)
+        }
     }
 
     return (<div>
