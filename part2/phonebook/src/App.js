@@ -11,10 +11,12 @@ const PersonForm = ({onSubmit, newName, newNumber, onNameChange, onNumberChange}
     <div> <button type="submit">add</button> </div>
 </form>)
 
-const Persons = ({persons}) => (<>
+const Persons = ({persons, rmPerson}) => (<>
     <h2>Numbers</h2>
     <ul>
-        {persons.map(p => <li key={p.name}>{p.name} {p.number}</li>)}
+        {persons.map(p => <li key={p.name}>{p.name} {p.number}
+            <button onClick={() => window.confirm(`Delete ${p.name}?`) && rmPerson(p.id)}>delete</button>
+            </li>)}
     </ul>
 </>)
 
@@ -27,6 +29,10 @@ const App = () => {
     useEffect(() => personDB.getPersons().then(setPersons), [])
 
     const shownPersons = persons.filter(p => p.name.toLowerCase().includes(nameFilter.toLowerCase()))
+
+    const rmPerson = id => personDB.deletePerson(id)
+        .then(returnedPerson => persons.filter(p => p.id !== id))
+        .then(setPersons)
 
     const addName = e => {
         e.preventDefault()
@@ -51,7 +57,7 @@ const App = () => {
         <Filter filter={nameFilter} onChange={e => setNameFilter(e.target.value)}/>
         <h3>Add a new</h3>
         <PersonForm onSubmit={addName} newName={newName} newNumber={newNumber} onNameChange={e => setNewName(e.target.value)} onNumberChange={e => setNewNumber(e.target.value)}/> {/* Why do you even want to do this? What's the point? */}
-        <Persons persons={shownPersons} />
+        <Persons persons={shownPersons} rmPerson={rmPerson} />
     </div>)
 }
 
