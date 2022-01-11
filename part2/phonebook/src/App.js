@@ -1,11 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import axios from 'axios'
-
-// server helpers
-const DB_URL = 'http://de.irscybersec.tk:3001/persons'
-const dataOf = r => r.data
-const getPersons = () => axios.get(DB_URL).then(dataOf)
-const addPerson = person => axios.post(DB_URL, person).then(dataOf)
+import personDB from './services/personDB'
 
 const Filter = ({filter, onChange}) => (<>
     <p>filter shown with <input value={filter} onChange={onChange}/></p>
@@ -30,7 +24,7 @@ const App = () => {
     const [newNumber, setNewNumber] = useState('')
     const [nameFilter, setNameFilter] = useState('')
 
-    useEffect(() => getPersons().then(setPersons), [])
+    useEffect(() => personDB.getPersons().then(setPersons), [])
 
     const shownPersons = persons.filter(p => p.name.toLowerCase().includes(nameFilter.toLowerCase()))
 
@@ -45,7 +39,7 @@ const App = () => {
             number: newNumber,
             //id: persons.length + 1
         }
-        addPerson(newPerson).then(returnedPerson => {
+        personDB.addPerson(newPerson).then(returnedPerson => {
             setPersons(persons.concat(returnedPerson))
             setNewName('')
             setNewNumber('')
