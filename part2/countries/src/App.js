@@ -5,6 +5,28 @@ const Filter = ({query, setQuery}) => (<div>
     <input value={query} onChange={(e) => setQuery(e.target.value)}/>
 </div>)
 
+const CountryWeather = ({country}) => {
+    const [weather, setWeather] = useState(null);
+    const api_key = process.env.REACT_APP_API_KEY;
+    //
+    useEffect(() => axios.get(`http://api.openweathermap.org/data/2.5/weather?q=${country.capital}&appid=${api_key}&units=metric`)
+            .then(response => setWeather(response.data))
+    , [country]);
+
+    if (!weather) { return <div>Loading...</div> }
+
+    // new API version doesn't seem to have weather icon urls
+    return (<div>
+        <h2>Weather in {country.capital}</h2>
+        <div>
+            <b>temperature:</b> {weather.main.temp} Celsius
+        </div>
+        <div>
+            <b>wind:</b> {weather.wind.speed} m/s, direction: {weather.wind.deg} degrees
+        </div>
+    </div>)
+}
+
 const CountryInfo = ({country}) => (<div>
     <h1>{country.name.common}</h1>
     <div>capital {country.capital}</div>
@@ -15,6 +37,7 @@ const CountryInfo = ({country}) => (<div>
             .map(l => <li key={l}>{l}</li>)}
     </ul>
     <img src={country.flags.png} alt="flag"/>
+    <CountryWeather country={country}/>
 </div>)
 
 const CountryMinified = ({country}) => {
@@ -30,12 +53,13 @@ const CountryMinified = ({country}) => {
 
 const FilteredCountries = ({countries}) => {
     if (countries.length === 1) {
+        console.log(countries[0]);
         return <CountryInfo country={countries[0]}/>
     } else if (countries.length > 10) {
         return <p>Too many matches, specify another filter</p>
     } else if (countries.length > 1) {
         return <ul>
-            {countries.map(c => <CountryMinified country={c} />)}
+            {countries.map(c => <CountryMinified key={c.name.common} country={c} />)}
         </ul>
     } else {
         return <p>No matches</p>
