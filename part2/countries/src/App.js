@@ -17,6 +17,17 @@ const CountryInfo = ({country}) => (<div>
     <img src={country.flags.png} alt="flag"/>
 </div>)
 
+const CountryMinified = ({country}) => {
+    const [show, setShow] = useState(false);
+    return (<li key={country.name.common}>
+        {country.name.common}
+        <button onClick={() => setShow(!show)}>
+            {show ? 'hide' : 'show'}
+        </button>
+        {show && <CountryInfo country={country}/>}
+    </li>)
+}
+
 const FilteredCountries = ({countries}) => {
     if (countries.length === 1) {
         return <CountryInfo country={countries[0]}/>
@@ -24,7 +35,7 @@ const FilteredCountries = ({countries}) => {
         return <p>Too many matches, specify another filter</p>
     } else if (countries.length > 1) {
         return <ul>
-            {countries.map(c => <li key={c.name.common}>{c.name.common}</li>)}
+            {countries.map(c => <CountryMinified country={c} />)}
         </ul>
     } else {
         return <p>No matches</p>
