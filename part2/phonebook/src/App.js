@@ -3,10 +3,10 @@ import personDB from './services/personDB'
 
 const genericError = () => alert('Something went wrong with the server')
 
-const Notification = ({message}) => {
+const Infobox = ({message, color}) => {
     if (message === null) { return null }
     let style = {
-        color: 'green',
+        color: color,
         background: 'lightgrey',
         fontSize: 20,
         borderStyle: 'solid',
@@ -18,6 +18,14 @@ const Notification = ({message}) => {
         {message}
     </div>)
 }
+
+const Notification = ({message}) => (
+    <Infobox message={message} color={'green'}/>
+)
+
+const Errbox = ({message}) => (
+    <Infobox message={message} color={'red'}/>
+)
 
 const Filter = ({filter, onChange}) => (<>
     <p>filter shown with <input value={filter} onChange={onChange}/></p>
@@ -44,6 +52,7 @@ const App = () => {
     const [newNumber, setNewNumber] = useState('')
     const [nameFilter, setNameFilter] = useState('')
     const [notif, setNotif] = useState(null)
+    const [err, setErr] = useState(null)
     const clearForm = () => {
         setNewName('')
         setNewNumber('')
@@ -80,8 +89,13 @@ const App = () => {
                     .then(returnedPerson => setPersons(persons.map(
                         p => p.id===origPerson.id ? returnedPerson : p
                     ))).then(clearForm).then(() =>
-                        updateNotif(`Updated ${newName}`))
-                    .catch(genericError)
+                        updateNotif(`Updated ${newName}`)
+                    ).catch(() => {
+                        setErr(`${newName} has already been removed from server`)
+                        setTimeout(() => {
+                            setErr(null)
+                        }, 5000)
+                    })
             }
         } else {
             personDB.addPerson(newPerson).then(returnedPerson => {
@@ -95,6 +109,7 @@ const App = () => {
     return (<div>
         <h2>Phonebook</h2>
         <Notification message={notif}/>
+        <Errbox message={err}/>
         <Filter filter={nameFilter} onChange={e => setNameFilter(e.target.value)}/>
         <h3>Add a new</h3>
         <PersonForm onSubmit={addName} newName={newName} newNumber={newNumber} onNameChange={e => setNewName(e.target.value)} onNumberChange={e => setNewNumber(e.target.value)}/> {/* Why do you even want to do this? What's the point? */}
