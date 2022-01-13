@@ -3,6 +3,22 @@ import personDB from './services/personDB'
 
 const genericError = () => alert('Something went wrong with the server')
 
+const Notification = ({message}) => {
+    if (message === null) { return null }
+    let style = {
+        color: 'green',
+        background: 'lightgrey',
+        fontSize: 20,
+        borderStyle: 'solid',
+        borderRadius: 5,
+        padding: 10,
+        marginBottom: 10,
+    }
+    return (<div style={style} className="error">
+        {message}
+    </div>)
+}
+
 const Filter = ({filter, onChange}) => (<>
     <p>filter shown with <input value={filter} onChange={onChange}/></p>
 </>)
@@ -27,12 +43,20 @@ const App = () => {
     const [newName, setNewName] = useState('')
     const [newNumber, setNewNumber] = useState('')
     const [nameFilter, setNameFilter] = useState('')
+    const [notif, setNotif] = useState(null)
     const clearForm = () => {
         setNewName('')
         setNewNumber('')
     }
 
     useEffect(() => personDB.getPersons().then(setPersons), [])
+
+    const updateNotif = (message) => {
+        setNotif(message)
+        setTimeout(() => {
+            setNotif(null)
+        }, 5000) // this is a race condition
+    }
 
     const shownPersons = persons.filter(p => p.name.toLowerCase().includes(nameFilter.toLowerCase()))
 
@@ -55,19 +79,22 @@ const App = () => {
                 personDB.editPerson(origPerson.id, newPerson)
                     .then(returnedPerson => setPersons(persons.map(
                         p => p.id===origPerson.id ? returnedPerson : p
-                    ))).then(clearForm)
+                    ))).then(clearForm).then(() =>
+                        updateNotif(`Updated ${newName}`))
                     .catch(genericError)
             }
         } else {
             personDB.addPerson(newPerson).then(returnedPerson => {
                 setPersons(persons.concat(returnedPerson))
                 clearForm()
+                updateNotif(`Added ${newName}`)
             }).catch(genericError)
         }
     }
 
     return (<div>
         <h2>Phonebook</h2>
+        <Notification message={notif}/>
         <Filter filter={nameFilter} onChange={e => setNameFilter(e.target.value)}/>
         <h3>Add a new</h3>
         <PersonForm onSubmit={addName} newName={newName} newNumber={newNumber} onNameChange={e => setNewName(e.target.value)} onNumberChange={e => setNewNumber(e.target.value)}/> {/* Why do you even want to do this? What's the point? */}
