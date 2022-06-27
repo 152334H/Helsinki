@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node index.js",
     "dev": "nodemon index.js",
-    "test": "echo 'no tests'"
+    "test": "echo 'no tests'",
+    "lint": "eslint ."
   },
   "repository": {
     "type": "git",
@@ -19,7 +20,7 @@
   },
   "homepage": "https://github.com/152334H/helsinki-part3-phonebook#readme",
   "devDependencies": {
-    "eslint": "^8.10.0",
+    "eslint": "^8.18.0",
     "nodemon": "^2.0.15"
   },
   "dependencies": {
