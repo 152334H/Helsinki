@@ -1,0 +1,31 @@
+# 4.1 init process
+* make directory, and `npm init`
+* get package.json looking like this:
+  ```json
+  {
+    "name": "bloglist",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+      "test": "jest --verbose",
+      "start": "node index.js",
+      "dev": "nodemon index.js",
+      "lint": "eslint ."
+    },
+    "author": "152334H",
+    "license": "ISC",
+    "dependencies": {
+      "cors": "^2.8.5",
+      "dotenv": "^16.0.1",
+      "express": "^4.18.1",
+      "mongoose": "^6.4.0",
+      "morgan": "^1.10.0"
+    },
+    "devDependencies": {
+      "eslint": "^8.18.0",
+      "nodemon": "^2.0.18"
+    }
+  }
+  ```
+* write the code lol
