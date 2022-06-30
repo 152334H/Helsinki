@@ -64,7 +64,7 @@ beforeAll(async () => {
 })
 
 const nonExistingId = async () => {
-  const blog = new Blog({title: 'no'})
+  const blog = new Blog({title: 'no', url: 'no'})
   await blog.save()
   await blog.remove()
 
@@ -84,32 +84,55 @@ test('huh', async () => {
   expect(res.body[0].id).toBeDefined();
 })
 
-test('bad post', async () => {
-  const badBlog = {
-    urmom: 'hi'
-  }
-  const res = await api.post('/api/blogs')
-    .send(badBlog)
-    .expect(400)
+describe('POST', () => {
+  test('missing params', async () => {
+    const badBlog = { urmom: 'hi' }
+    const res = await api.post('/api/blogs')
+      .send(badBlog)
+      .expect(400)
+  })
+
+  test('successful POST', async () => {
+    const newBlog = {
+        title: "testblog1",
+        author: "me",
+        url: "https://me.ai/",
+      }
+    // try to POST
+    const res = await api.post('/api/blogs')
+      .send(newBlog)
+      .expect(201)
+      .expect('Content-Type', /application\/json/)
+    // check the returned blog object
+    expect(_.omit(res.body, ['id']))
+      .toStrictEqual({
+        ...newBlog,
+        likes: 0 // likes should default to 0 if not present 
+      });
+    // check that the DB contains more posts
+    const blogs = await blogsInDB();
+    expect(blogs).toHaveLength(origBlogs.length+1);
+  })
 })
 
-test('post', async () => {
-  const newBlog = {
-      title: "my blog",
-      author: "me",
-      url: "https://me.ai/",
-    }
-  const res = await api.post('/api/blogs')
-    .send(newBlog)
-    .expect(201)
-    .expect('Content-Type', /application\/json/)
-  expect(_.omit(res.body, ['id'])).toStrictEqual({
-    ...newBlog,
-    likes: 0 // likes should default to 0 if not present 
-  });
+describe('DELETE', () => {
+  test('successful delete', async () => {
+    // find the blog from previous POST
+    const blogs = await blogsInDB();
+    const filtered = blogs.filter(b => b.title === 'testblog1');
+    expect(filtered).toHaveLength(1);
+    const toRemove = filtered[0];
+    expect(toRemove.id).toBeDefined();
+    // get rid of it
+    await api.delete(`/api/blogs/${toRemove.id}`)
+      .expect(204);
+  })
 
-  const blogs = await blogsInDB();
-  expect(blogs).toHaveLength(origBlogs.length+1);
+  test('failed delete', async () => {
+    const badId = await nonExistingId();
+    await api.delete(`/api/blogs/${badId}`)
+      .expect(404);
+  })
 })
 
 afterAll(() => {
