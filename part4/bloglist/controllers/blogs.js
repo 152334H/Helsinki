@@ -12,10 +12,19 @@ blogsRouter.post('/', async (req, res) => {
 })
 
 blogsRouter.delete('/:id', async (req, res) => {
-  const blog = await Blog.findOneAndRemove({_id: {
-    $in: req.params.id
-  }});
-  res.status(blog === null ? 404 : 204).end();
+  const blog = await Blog.findByIdAndUpdate(req.params.id);
+  return res.status(blog === null ? 404 : 204).end();
 })
+
+blogsRouter.put('/:id', async (req, res) => {
+  const {likes} = req.body;
+  if (!Number.isFinite(likes))
+    return res.status(400).json({error: '`likes` was not provided or non-numeric'})
+  const updated = await Blog.findByIdAndUpdate(
+    req.params.id, {likes},
+    {new: true, runValidators: true, context: 'query'}
+  );
+  return res.json(updated);
+});
 
 module.exports = blogsRouter;

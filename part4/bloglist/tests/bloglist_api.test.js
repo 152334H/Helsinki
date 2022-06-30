@@ -8,6 +8,11 @@ const Blog = require('../models/blog');
 
 const api = supertest(app)
 
+const newBlog = {
+  title: "testblog1",
+  author: "me",
+  url: "https://me.ai/",
+}
 const origBlogs = [
     {
       _id: "5a422a851b54a676234d17f7",
@@ -93,11 +98,6 @@ describe('POST', () => {
   })
 
   test('successful POST', async () => {
-    const newBlog = {
-        title: "testblog1",
-        author: "me",
-        url: "https://me.ai/",
-      }
     // try to POST
     const res = await api.post('/api/blogs')
       .send(newBlog)
@@ -115,14 +115,37 @@ describe('POST', () => {
   })
 })
 
+const findBlog = async (title) => {
+  const blogs = await blogsInDB();
+  const filtered = blogs.filter(b => b.title === title);
+  expect(filtered).toHaveLength(1);
+  const res = filtered[0];
+  expect(res.id).toBeDefined();
+  return res;
+}
+
+describe('PUT', () => {
+  test('update likes', async () => {
+    const toEdit = await findBlog(newBlog.title);
+    const res = await api.put(`/api/blogs/${toEdit.id}`)
+      .send({likes:300})
+      .expect(200)
+      .expect('Content-Type', /application\/json/)
+    expect(res.body.likes).toBe(300)
+  })
+
+  test('invalid update', async () => {
+    const toEdit = await findBlog(newBlog.title);
+    const res = await api.put(`/api/blogs/${toEdit.id}`)
+      .send({lmao:999})
+      .expect(400)
+  })
+});
+
 describe('DELETE', () => {
   test('successful delete', async () => {
     // find the blog from previous POST
-    const blogs = await blogsInDB();
-    const filtered = blogs.filter(b => b.title === 'testblog1');
-    expect(filtered).toHaveLength(1);
-    const toRemove = filtered[0];
-    expect(toRemove.id).toBeDefined();
+    const toRemove = await findBlog(newBlog.title);
     // get rid of it
     await api.delete(`/api/blogs/${toRemove.id}`)
       .expect(204);
