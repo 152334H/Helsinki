@@ -15,6 +15,7 @@ const newBlog = {
   title: "testblog1",
   author: "me",
   url: "https://me.ai/",
+  user: undefined,
 }
 
 let origUsers;
@@ -23,7 +24,8 @@ beforeAll(async () => {
   await Blog.insertMany(origBlogs);
   await User.deleteMany({});
   origUsers = await getDummyUsers();
-  await User.insertMany(origUsers);
+  await User.insertMany(origUsers)
+    .then(users => newBlog.user = `${users[0]._id}`);
 })
 
 test('GET blogs', async () => {
@@ -35,8 +37,15 @@ test('GET blogs', async () => {
 })
 
 describe('POST', () => {
+  test('missing uid', async () => {
+    const badBlog = {}
+    const res = await api.post('/api/blogs')
+      .send(badBlog)
+      .expect(400)
+  })
+
   test('missing params', async () => {
-    const badBlog = { urmom: 'hi' }
+    const badBlog = { urmom: 'hi', user: 'hi'}
     const res = await api.post('/api/blogs')
       .send(badBlog)
       .expect(400)
@@ -110,6 +119,8 @@ test('GET user', async () => {
   expect(res.body).toHaveLength(origUsers.length);
   expect(res.body[0].id).toBeDefined();
   expect(res.body[0].passwordHash).toBeUndefined();
+  expect(_.omit(res.body[0].blogs[0], ['id', 'likes']))
+    .toEqual(_.omit(newBlog, ['user']));
 })
 
 describe('POST user', () => {

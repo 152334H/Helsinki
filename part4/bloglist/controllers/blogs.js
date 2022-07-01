@@ -1,14 +1,30 @@
 const blogsRouter = require('express').Router()
 const Blog = require('../models/blog')
+const User = require('../models/user')
 
 blogsRouter.get('/', async (req, res) => {
-  const blogs = await Blog.find({});
+  const blogs = await Blog.find({})
+    .populate('user', {username: 1, name: 1});
   res.json(blogs);
 })
 
 blogsRouter.post('/', async (req, res) => {
-  const saved = await new Blog(req.body).save();
-  res.status(201).json(saved);
+  const user = await User.findById(req.body.user);
+  if (user === null) return res.status(400)
+    .json({error: '`user` ID was invalid or not provided'});
+
+  const saved = await new Blog({
+    ...req.body, user: user._id
+  }).save();
+
+  try {
+    user.blogs.push(saved._id);
+    await user.save();
+    res.status(201).json(saved);
+  } catch (e) {
+    console.error("*WARNING*: BLOG WAS PUSHED WITHOUT UPDATING USER")
+    throw e;
+  }
 })
 
 blogsRouter.delete('/:id', async (req, res) => {
