@@ -17,14 +17,16 @@ const newBlog = {
   url: "https://me.ai/",
 }
 
+let origUsers;
 beforeAll(async () => {
   await Blog.deleteMany({});
   await Blog.insertMany(origBlogs);
   await User.deleteMany({});
-  await User.insertMany(await getDummyUsers());
+  origUsers = await getDummyUsers();
+  await User.insertMany(origUsers);
 })
 
-test('huh', async () => {
+test('GET blogs', async () => {
   const res = await api.get('/api/blogs')
     .expect(200)
     .expect('Content-Type', /application\/json/)
@@ -101,9 +103,18 @@ describe('DELETE', () => {
   })
 })
 
+test('GET user', async () => {
+  const res = await api.get('/api/users')
+    .expect(200)
+    .expect('Content-Type', /application\/json/)
+  expect(res.body).toHaveLength(origUsers.length);
+  expect(res.body[0].id).toBeDefined();
+  expect(res.body[0].passwordHash).toBeUndefined();
+})
+
 describe('POST user', () => {
   test('cannot duplicate username', async () => {
-    const initialUsers =await usersInDB();
+    const initialUsers = await usersInDB();
     const newUser = {
       username: 'a', name: 'A', password: 'a'
     };
@@ -116,7 +127,6 @@ describe('POST user', () => {
     expect(await usersInDB()).toEqual(initialUsers);
   })
   test('success', async () => {
-    const initialUsers = await usersInDB();
     const newUser = {
       username: 'urmom', name: 'hi', password: 'lol'
     };
@@ -125,7 +135,7 @@ describe('POST user', () => {
       .expect(201)
       .expect('Content-Type', /application\/json/)
     const finalUsers = await usersInDB();
-    expect(finalUsers).toHaveLength(initialUsers.length+1);
+    expect(finalUsers).toHaveLength(origUsers.length+1);
     expect(finalUsers.map(u => u.username))
       .toContain('urmom')
   })
