@@ -1,7 +1,7 @@
 const blogsRouter = require('express').Router()
 const Blog = require('../models/blog')
 const User = require('../models/user')
-const jwt = require('jsonwebtoken')
+const {tokenVerifier} = require('../util/middleware')
 
 blogsRouter.get('/', async (req, res) => {
   const blogs = await Blog.find({})
@@ -9,11 +9,8 @@ blogsRouter.get('/', async (req, res) => {
   res.json(blogs);
 })
 
-blogsRouter.post('/', async (req, res) => {
-  const decodedToken = jwt.verify(req.token, process.env.SECRET);
-  if (!decodedToken.id)
-    return res.status(401).json({error: 'JWT missing or invalid'})
-
+blogsRouter.post('/', tokenVerifier, async (req, res) => {
+  // TODO: use uid from token instead of body
   const user = await User.findById(req.body.user);
   if (user === null) return res.status(400)
     .json({error: '`user` ID was invalid or not provided'});
@@ -32,9 +29,16 @@ blogsRouter.post('/', async (req, res) => {
   }
 })
 
-blogsRouter.delete('/:id', async (req, res) => {
-  const blog = await Blog.findByIdAndUpdate(req.params.id);
-  return res.status(blog === null ? 404 : 204).end();
+blogsRouter.delete('/:id', tokenVerifier, async (req, res) => {
+  const blog = await Blog.findById(req.params.id);
+  if (blog === null) return res.status(404).end();
+
+  if (blog.user.toString() !== req.token.id)
+    return res.status(401)
+      .json({error: 'user was not the creator of the given blog'})
+
+  await blog.remove();
+  return res.status(204).end()
 })
 
 blogsRouter.put('/:id', async (req, res) => {

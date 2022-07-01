@@ -120,22 +120,6 @@ describe('PUT', () => {
   })
 });
 
-describe('DELETE', () => {
-  test('successful delete', async () => {
-    // find the blog from previous POST
-    const toRemove = await findBlog(newBlog.title);
-    // get rid of it
-    await api.delete(`/api/blogs/${toRemove.id}`)
-      .expect(204);
-  })
-
-  test('failed delete', async () => {
-    const badId = await nonExistingId();
-    await api.delete(`/api/blogs/${badId}`)
-      .expect(404);
-  })
-})
-
 test('GET user', async () => {
   const res = await api.get('/api/users')
     .expect(200)
@@ -145,6 +129,30 @@ test('GET user', async () => {
   expect(res.body[0].passwordHash).toBeUndefined();
   expect(_.omit(res.body[0].blogs[0], ['id', 'likes']))
     .toEqual(_.omit(newBlog, ['user']));
+})
+
+describe('DELETE', () => {
+  test('successful delete', async () => {
+    // find the blog from previous POST
+    const toRemove = await findBlog(newBlog.title);
+    // get rid of it
+    await api.delete(`/api/blogs/${toRemove.id}`)
+      .auth(jwt, {type: 'bearer'})
+      .expect(204);
+  })
+
+  test('failed delete', async () => {
+    const badId = await nonExistingId();
+    await api.delete(`/api/blogs/${badId}`)
+      .auth(jwt, {type: 'bearer'})
+      .expect(404);
+  })
+
+  test('unauth delete', async () => {
+    const badId = await nonExistingId();
+    await api.delete(`/api/blogs/${badId}`)
+      .expect(401);
+  })
 })
 
 describe('POST user', () => {
