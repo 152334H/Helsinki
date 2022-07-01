@@ -12,13 +12,18 @@ const unknownEndpoint = (request, response) => {
   response.status(404).send({ error: 'unknown endpoint' })
 }
 
-const errorHandler = (error, request, response, next) => {
+const errorHandler = (error, request, res, next) => {
   log.error(error.message)
 
-  if (error.name === 'CastError') {
-    return response.status(400).send({ error: 'malformatted id' })
-  } else if (error.name === 'ValidationError') {
-    return response.status(400).json({ error: error.message })
+  switch (error.name) {
+    case 'CastError':
+      return res.status(400).send({ error: 'malformatted id' })
+    case 'ValidationError':
+      return res.status(400).json({ error: error.message })
+    case 'JsonWebTokenError':
+      return res.status(401).json({ error: 'invalid JWT'})
+    case 'TokenExpiredError':
+      return res.status(401).json({ error: 'JWT expired'})
   }
 
   next(error)

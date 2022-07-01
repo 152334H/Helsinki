@@ -23,6 +23,7 @@ app.use(express.json())
 app.use(mw.requestLogger)
 app.use('/api/blogs', require('./controllers/blogs'))
 app.use('/api/users', require('./controllers/users'))
+app.use('/api/login', require('./controllers/login'))
 
 app.use(mw.unknownEndpoint)
 app.use(mw.errorHandler)

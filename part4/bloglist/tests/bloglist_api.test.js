@@ -28,6 +28,22 @@ beforeAll(async () => {
     .then(users => newBlog.user = `${users[0]._id}`);
 })
 
+let jwt;
+describe('login', () => {
+  test('failed login', async () => {
+    await api.post('/api/login')
+      .send({urmom:1})
+      .expect(401)
+  })
+  test('good login', async () => {
+    const res = await api.post('/api/login')
+      .send({username: 'a', password: 'a'})
+      .expect(200)
+      .expect('Content-Type', /application\/json/);
+    jwt = res.body.token
+  })
+})
+
 test('GET blogs', async () => {
   const res = await api.get('/api/blogs')
     .expect(200)
@@ -37,16 +53,23 @@ test('GET blogs', async () => {
 })
 
 describe('POST', () => {
-  test('missing uid', async () => {
-    const badBlog = {}
+  test('missing auth', async () => {
     const res = await api.post('/api/blogs')
-      .send(badBlog)
+      .send({})
+      .expect(401)
+  })
+
+  test('missing uid', async () => {
+    const res = await api.post('/api/blogs')
+      .auth(jwt, {type: 'bearer'})
+      .send({})
       .expect(400)
   })
 
   test('missing params', async () => {
     const badBlog = { urmom: 'hi', user: 'hi'}
     const res = await api.post('/api/blogs')
+      .auth(jwt, {type: 'bearer'})
       .send(badBlog)
       .expect(400)
   })
@@ -54,6 +77,7 @@ describe('POST', () => {
   test('successful POST', async () => {
     // try to POST
     const res = await api.post('/api/blogs')
+      .auth(jwt, {type: 'bearer'})
       .send(newBlog)
       .expect(201)
       .expect('Content-Type', /application\/json/)
