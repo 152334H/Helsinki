@@ -22,6 +22,7 @@ const app = express()
 app.use(express.json())
 app.use(mw.requestLogger)
 app.use('/api/blogs', require('./controllers/blogs'))
+app.use('/api/users', require('./controllers/users'))
 
 app.use(mw.unknownEndpoint)
 app.use(mw.errorHandler)
