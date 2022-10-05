@@ -1,0 +1,6 @@
+node_modules
+.env
+docker-compose.yml
+
+part3/part3-notes-backend
+part4/notes-backend
