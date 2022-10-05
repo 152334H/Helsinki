@@ -90,19 +90,19 @@ const App = () => {
                         p => p.id===origPerson.id ? returnedPerson : p
                     ))).then(clearForm).then(() =>
                         updateNotif(`Updated ${newName}`)
-                    ).catch(() => {
-                        setErr(`${newName} has already been removed from server`)
-                        setTimeout(() => {
-                            setErr(null)
-                        }, 5000)
-                    })
+                    ).catch(e => {
+                        setErr(`${e.response.data.error}`);
+                        setTimeout(() => { setErr(null) }, 5000) })
             }
         } else {
             personDB.addPerson(newPerson).then(returnedPerson => {
                 setPersons(persons.concat(returnedPerson))
                 clearForm()
                 updateNotif(`Added ${newName}`)
-            }).catch(genericError)
+            }).catch(e => {
+                setErr(`${e.response.data.error}`);
+                setTimeout(() => { setErr(null) }, 5000) 
+            })
         }
     }
 
